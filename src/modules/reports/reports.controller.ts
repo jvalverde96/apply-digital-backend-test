@@ -1,9 +1,11 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseFilters, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { ReportsService } from './reports.service';
 import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ProductProperties } from 'src/constants/constants';
+import { HttpExceptionFilter } from 'src/utils/error-handler';
 
+@UseFilters(HttpExceptionFilter)
 @Controller('reports')
 @ApiBearerAuth()
 export class ReportsController {
