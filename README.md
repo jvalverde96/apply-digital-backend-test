@@ -71,9 +71,12 @@ POSTGRES_DB=products_db
 
 4. Access the API
 
-* Public module: Accessible without authentication.
+* Public module (Products): Accessible without authentication.
 
-* Private module: Requires a valid JWT in the Authorization header.
+* Private module (Reports): Requires a valid JWT in the Authorization header. Use the endpoint ```http://localhost:3000/auth/login``` in order to get a valid access token.
+Use the following credentials in the request body to login: 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;``` {"email": "user@gmail.com","password": "hello123"}```
 
 * Swagger documentation: Navigate to http://localhost:3000/api/docs.
 
