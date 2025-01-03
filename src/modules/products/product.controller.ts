@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Post,
   Query,
   UseFilters,
 } from '@nestjs/common';
@@ -128,6 +129,12 @@ export class ProductsController {
       message: `Product with id: ${id} deleted successfully!`,
       metadata: updatedProduct,
     };
+  }
+
+  @Post('/sync')
+  async syncProducts() {
+    await this.productsService.fetchProducts();
+    return { success: true, message: 'Data synced successfully.' };
   }
 }
 
