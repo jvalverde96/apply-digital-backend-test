@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -15,8 +15,11 @@ export class AuthService {
       const payload = { email, sub: 1 }; // 'sub' represents the user ID
       const token = this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET_KEY,
+        expiresIn: '1h',
       });
       return { accessToken: token };
+    } else {
+      throw new UnauthorizedException('Invalid credentials');
     }
   }
 }
