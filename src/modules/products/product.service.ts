@@ -70,6 +70,14 @@ export class ProductsService {
   }
 
   async deleteProduct(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
+    });
+    if (!product || !id) {
+      throw new Error(
+        `The product with ID ${id} was not found or the product ID parameter is missing.`,
+      );
+    }
     await this.productRepository.update(id, { deleted: true });
     logger.info(`Deleted flag set to true for product with id ${id}.`);
     const updatedProduct = await this.productRepository.findOne({
@@ -79,6 +87,12 @@ export class ProductsService {
   }
 
   async deleteAllProducts(): Promise<void> {
+    const count = await this.productRepository.count();
+    if (count === 0) {
+      throw new Error(
+        'The table contains no elements. No deletions were performed.',
+      );
+    }
     await this.productRepository.clear();
     logger.info('All products have been deleted successfully.');
   }

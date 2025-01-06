@@ -25,7 +25,6 @@ export class ReportsController {
       success: true,
       result: percentage,
       metadata: null,
-      error: null,
     };
   }
 
@@ -70,7 +69,6 @@ export class ReportsController {
       success: true,
       result: percentage,
       metadata: null,
-      error: null,
     };
   }
 
@@ -112,7 +110,6 @@ export class ReportsController {
         reportCriteria: criteria,
         value,
       },
-      error: null,
     };
   }
 }

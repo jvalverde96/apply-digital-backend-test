@@ -122,7 +122,6 @@ export class ProductsController {
         page,
         count: products.length,
       },
-      error: null,
     };
   }
 
@@ -145,7 +144,6 @@ export class ProductsController {
       metadata: {
         id,
       },
-      error: null,
     };
   }
 
@@ -162,7 +160,6 @@ export class ProductsController {
       success: true,
       result: 'All products have been deleted successfully.',
       metadata: null,
-      error: null,
     };
   }
 
@@ -179,7 +176,6 @@ export class ProductsController {
       success: true,
       result: products,
       metadata: null,
-      error: null,
     };
   }
 }
