@@ -14,5 +14,8 @@ COPY . .
 # Expose port 3000
 EXPOSE 3000
 
+#Build application
+RUN npm run build
+
 # Command to run the application
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "start"]
