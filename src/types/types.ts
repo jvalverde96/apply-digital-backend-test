@@ -9,5 +9,5 @@ export type ApiResponse<T = unknown> = {
 
 export type CustomReport = {
   count: number;
-  products: Product;
+  products: Product[];
 };
