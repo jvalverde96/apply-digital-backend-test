@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './product.service';
 import { Product } from './product.entity';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import logger from 'src/utils/logger';
 import { HttpExceptionFilter } from 'src/utils/error-handler';
+import { ApiResponse } from 'src/types/types';
 
 @UseFilters(HttpExceptionFilter)
 @Controller('products')
@@ -20,6 +21,11 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'Fetch paginated products.',
+    description:
+      'Retrieves a list of products from the database with pagination support. You can filter the products by various parameters like SKU, name, brand, category, etc., and specify the page number for the results.',
+  })
   @ApiQuery({
     name: 'page',
     required: true,
@@ -91,7 +97,7 @@ export class ProductsController {
     @Query('price') price?: number,
     @Query('currency') currency?: string,
     @Query('stock') stock?: number,
-  ) {
+  ): Promise<ApiResponse<Product[]>> {
     const filters: Partial<Product> = {
       sku,
       name,
@@ -109,36 +115,68 @@ export class ProductsController {
       filters,
     );
 
-    logger.info(`Products fetched successfully!`);
-
     return {
       success: true,
+      result: products,
       metadata: {
         page,
-        products,
+        count: products.length,
       },
+      error: null,
     };
   }
 
-  @Delete(':id')
-  async deleteProduct(@Param('id', ParseUUIDPipe) id: string) {
+  @Post(':id')
+  @ApiOperation({
+    summary: 'Simulate product deletion.',
+    description:
+      'Sets the "deleted" flag to true for a specific product, effectively marking it as deleted without actually removing it from the database. This is useful for soft deletion where the data is kept for future reference.',
+  })
+  async deleteProduct(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ApiResponse<Product>> {
     const updatedProduct = await this.productsService.deleteProduct(id);
     logger.info(`Product with id: ${id} deleted successfully!`);
+
     return {
       success: true,
-      message: `Product with id: ${id} deleted successfully!`,
-      metadata: updatedProduct,
+      result: updatedProduct,
+      metadata: {
+        id,
+      },
+      error: null,
+    };
+  }
+
+  @Delete('/all')
+  @ApiOperation({
+    summary: 'Delete all products from the database.',
+    description:
+      'Permanently removes all product entries from the database, ensuring that no records remain. Use this operation with caution as it cannot be undone.',
+  })
+  async deleteAllProducts(): Promise<ApiResponse<string>> {
+    await this.productsService.deleteAllProducts();
+    return {
+      success: true,
+      result: 'All products have been deleted successfully.',
+      metadata: null,
+      error: null,
     };
   }
 
   @Post('/sync')
-  async syncProducts() {
-    await this.productsService.fetchProducts();
-    return { success: true, message: 'Data synced successfully.' };
+  @ApiOperation({
+    summary: 'Force product synchronization with Contentful.',
+    description:
+      'Triggers a manual sync with the Contentful API to fetch the latest products data. This operation updates the product table with the most current information from Contentful, ensuring the database is up-to-date.',
+  })
+  async syncProducts(): Promise<ApiResponse<Product[]>> {
+    const products = await this.productsService.fetchProducts();
+    return {
+      success: true,
+      result: products,
+      metadata: null,
+      error: null,
+    };
   }
 }
-
-// {
-//   "email": "user@gmail.com",
-//   "password": "hello123"
-// }

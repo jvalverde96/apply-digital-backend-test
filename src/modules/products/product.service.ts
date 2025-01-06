@@ -13,23 +13,23 @@ export class ProductsService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async fetchProducts(): Promise<void> {
-    try {
-      const client = createClient({
-        space: process.env.CONTENTFUL_SPACE_ID,
-        accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
-        environment: process.env.CONTENTFUL_ENVIRONMENT,
-      });
+  async fetchProducts(): Promise<Product[]> {
+    const client = createClient({
+      space: process.env.CONTENTFUL_SPACE_ID,
+      accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
+      environment: process.env.CONTENTFUL_ENVIRONMENT,
+    });
 
-      logger.info('Fetching products from Contentful API.');
+    logger.info('Fetching products from Contentful API.');
 
-      const response = await client.getEntries({
-        content_type: process.env.CONTENTFUL_CONTENT_TYPE,
-      });
+    const response = await client.getEntries({
+      content_type: process.env.CONTENTFUL_CONTENT_TYPE,
+    });
 
-      logger.info('Parsing objects to sql rows.');
+    logger.info('Parsing objects to sql rows.');
 
-      const products = response.items.map(async (item) => {
+    const products = await Promise.all(
+      response.items.map(async (item) => {
         const contentfulId = String(item.sys.id);
         const deleted =
           (
@@ -38,7 +38,7 @@ export class ProductsService {
             })
           )?.deleted || false;
 
-        const product = {
+        const product: Partial<Product> = {
           contentfulId,
           sku: String(item.fields.sku),
           name: String(item.fields.name),
@@ -54,24 +54,33 @@ export class ProductsService {
           deleted,
         };
         return product;
-      });
+      }),
+    );
 
-      logger.info('Inserting rows in product table.');
+    logger.info('Inserting rows in product table.');
 
-      for (const product of products) {
-        await this.productRepository.upsert(await product, ['contentfulId']);
-      }
-    } catch (error) {
-      logger.error(`Error fetching products: ${error}`);
+    for (const product of products) {
+      await this.productRepository.upsert(product, ['contentfulId']);
     }
+
+    logger.info(`Products fetched successfully!`);
+
+    const allProducts = await this.productRepository.find();
+    return allProducts;
   }
 
   async deleteProduct(id: string): Promise<Product> {
     await this.productRepository.update(id, { deleted: true });
+    logger.info(`Deleted flag set to true for product with id ${id}.`);
     const updatedProduct = await this.productRepository.findOne({
       where: { id },
     });
     return updatedProduct;
+  }
+
+  async deleteAllProducts(): Promise<void> {
+    await this.productRepository.clear();
+    logger.info('All products have been deleted successfully.');
   }
 
   async getPaginatedProducts(
@@ -80,6 +89,7 @@ export class ProductsService {
   ): Promise<Product[]> {
     const take = 5;
     const skip = (page - 1) * take;
+
     return this.productRepository.find({
       where: { ...filters, deleted: false },
       skip,

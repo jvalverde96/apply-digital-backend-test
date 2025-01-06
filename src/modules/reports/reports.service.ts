@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
 import { ProductProperties } from 'src/constants/constants';
+import { CustomReport } from 'src/types/types';
 
 @Injectable()
 export class ReportsService {
@@ -12,14 +13,12 @@ export class ReportsService {
   ) {}
 
   // Report 1: Percentage of Deleted Products
-  async getDeletedPercentage() {
+  async getDeletedPercentage(): Promise<number> {
     const total = await this.productRepository.count();
     const deleted = await this.productRepository.count({
       where: { deleted: true },
     });
-    return {
-      deletedPercentage: (deleted / total) * 100,
-    };
+    return (deleted / total) * 100;
   }
 
   // Report 2: Percentage of Non-Deleted Products with optional filters (price, date range)
@@ -27,7 +26,7 @@ export class ReportsService {
     withPrice?: boolean,
     startDate?: string,
     endDate?: string,
-  ) {
+  ): Promise<number> {
     const queryBuilder = this.productRepository.createQueryBuilder('product');
 
     queryBuilder.where('product.deleted = :deleted', { deleted: false });
@@ -53,13 +52,14 @@ export class ReportsService {
     const total = await this.productRepository.count();
     const nonDeleted = await queryBuilder.getCount();
 
-    return {
-      nonDeletedPercentage: (nonDeleted / total) * 100,
-    };
+    return (nonDeleted / total) * 100;
   }
 
   // Report 3: Custom Report
-  async getCustomReport(criteria: ProductProperties, value: string) {
+  async getCustomReport(
+    criteria: ProductProperties,
+    value: string,
+  ): Promise<CustomReport> {
     const isNumeric = (str: string) => !isNaN(Number(str));
 
     const products = await this.productRepository.find({
