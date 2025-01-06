@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
@@ -74,8 +74,9 @@ export class ProductsService {
       where: { id },
     });
     if (!product || !id) {
-      throw new Error(
+      throw new HttpException(
         `The product with ID ${id} was not found or the product ID parameter is missing.`,
+        HttpStatus.NOT_FOUND,
       );
     }
     await this.productRepository.update(id, { deleted: true });
@@ -89,8 +90,9 @@ export class ProductsService {
   async deleteAllProducts(): Promise<void> {
     const count = await this.productRepository.count();
     if (count === 0) {
-      throw new Error(
+      throw new HttpException(
         'The table contains no elements. No deletions were performed.',
+        HttpStatus.BAD_REQUEST,
       );
     }
     await this.productRepository.clear();
