@@ -44,7 +44,7 @@ Ensure the following tools are installed:
 ```
 # Contentful API variables 
 CONTENTFUL_SPACE_ID=9xs1613l9f7v
-CONTENTFUL_ACCESS_TOKEN=I-ThsT55eE_B3sCUWEQyDT4VqVO3x\_\_20ufuie9usns
+CONTENTFUL_ACCESS_TOKEN=I-ThsT55eE_B3sCUWEQyDT4VqVO3x__20ufuie9usns
 CONTENTFUL_ENVIRONMENT=master
 CONTENTFUL_CONTENT_TYPE=product```
 
