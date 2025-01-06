@@ -6,12 +6,12 @@ import { ProductProperties } from 'src/constants/constants';
 import { HttpExceptionFilter } from 'src/utils/error-handler';
 import { ApiResponse, CustomReport } from 'src/types/types';
 
-@UseFilters(HttpExceptionFilter)
 @Controller('reports')
 @ApiBearerAuth()
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
+  @UseFilters(HttpExceptionFilter)
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Percentage of deleted products.',
@@ -29,6 +29,7 @@ export class ReportsController {
     };
   }
 
+  @UseFilters(HttpExceptionFilter)
   @UseGuards(JwtAuthGuard)
   @Get('non-deleted-percentage')
   @ApiOperation({
@@ -73,6 +74,7 @@ export class ReportsController {
     };
   }
 
+  @UseFilters(HttpExceptionFilter)
   @UseGuards(JwtAuthGuard)
   @Get('custom-report')
   @ApiOperation({

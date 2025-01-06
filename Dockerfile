@@ -10,9 +10,6 @@ COPY package*.json ./
 # Install dependencies, including dev dependencies like @types/node
 RUN npm install
 
-# Ensure that TypeScript is installed globally if needed (optional)
-RUN npm install -g typescript
-
 # Copy the rest of the application code
 COPY . .
 

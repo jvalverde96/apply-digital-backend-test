@@ -15,11 +15,11 @@ import logger from 'src/utils/logger';
 import { HttpExceptionFilter } from 'src/utils/error-handler';
 import { ApiResponse } from 'src/types/types';
 
-@UseFilters(HttpExceptionFilter)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @UseFilters(HttpExceptionFilter)
   @Get()
   @ApiOperation({
     summary: 'Fetch paginated products.',
@@ -126,7 +126,8 @@ export class ProductsController {
     };
   }
 
-  @Post(':id')
+  @UseFilters(HttpExceptionFilter)
+  @Delete(':id')
   @ApiOperation({
     summary: 'Simulate product deletion.',
     description:
@@ -148,6 +149,7 @@ export class ProductsController {
     };
   }
 
+  @UseFilters(HttpExceptionFilter)
   @Delete('/all')
   @ApiOperation({
     summary: 'Delete all products from the database.',
@@ -164,6 +166,7 @@ export class ProductsController {
     };
   }
 
+  @UseFilters(HttpExceptionFilter)
   @Post('/sync')
   @ApiOperation({
     summary: 'Force product synchronization with Contentful.',
