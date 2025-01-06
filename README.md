@@ -22,6 +22,8 @@ The API is built using NestJS, TypeScript, PostgreSQL, and TypeORM, and is fully
 
 ## Prerequisites
 
+run ```npm install or yarn add```
+
 Ensure the following tools are installed:
 
 * Node.js (Active LTS version)
