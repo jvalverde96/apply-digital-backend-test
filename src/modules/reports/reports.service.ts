@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
 import { ProductProperties } from 'src/constants/constants';
 import { CustomReport } from 'src/types/types';
+import { buildInternalServerErrorResponse } from 'src/utils/error-handler';
 
 @Injectable()
 export class ReportsService {
@@ -14,11 +15,18 @@ export class ReportsService {
 
   // Report 1: Percentage of Deleted Products
   async getDeletedPercentage(): Promise<number> {
-    const total = await this.productRepository.count();
-    const deleted = await this.productRepository.count({
-      where: { deleted: true },
-    });
-    return (deleted / total) * 100;
+    try {
+      const total = await this.productRepository.count();
+      const deleted = await this.productRepository.count({
+        where: { deleted: true },
+      });
+      return (deleted / total) * 100;
+    } catch (error) {
+      throw buildInternalServerErrorResponse(
+        'An error occurred while generating Percentage of Deleted Products report',
+        error,
+      );
+    }
   }
 
   // Report 2: Percentage of Non-Deleted Products with optional filters (price, date range)
@@ -27,32 +35,39 @@ export class ReportsService {
     startDate?: string,
     endDate?: string,
   ): Promise<number> {
-    const queryBuilder = this.productRepository.createQueryBuilder('product');
+    try {
+      const queryBuilder = this.productRepository.createQueryBuilder('product');
 
-    queryBuilder.where('product.deleted = :deleted', { deleted: false });
+      queryBuilder.where('product.deleted = :deleted', { deleted: false });
 
-    if (withPrice !== undefined) {
-      if (withPrice) {
-        queryBuilder.andWhere('product.price IS NOT NULL');
-      } else {
-        queryBuilder.andWhere('product.price IS NULL');
+      if (withPrice !== undefined) {
+        if (withPrice) {
+          queryBuilder.andWhere('product.price IS NOT NULL');
+        } else {
+          queryBuilder.andWhere('product.price IS NULL');
+        }
       }
-    }
 
-    if (startDate && endDate) {
-      queryBuilder.andWhere(
-        'product.createdAt BETWEEN :startDate AND :endDate',
-        {
-          startDate,
-          endDate,
-        },
+      if (startDate && endDate) {
+        queryBuilder.andWhere(
+          'product.createdAt BETWEEN :startDate AND :endDate',
+          {
+            startDate,
+            endDate,
+          },
+        );
+      }
+
+      const total = await this.productRepository.count();
+      const nonDeleted = await queryBuilder.getCount();
+
+      return (nonDeleted / total) * 100;
+    } catch (error) {
+      throw buildInternalServerErrorResponse(
+        'An error occurred while generating Percentage of Non Deleted Products report',
+        error,
       );
     }
-
-    const total = await this.productRepository.count();
-    const nonDeleted = await queryBuilder.getCount();
-
-    return (nonDeleted / total) * 100;
   }
 
   // Report 3: Custom Report
@@ -60,15 +75,22 @@ export class ReportsService {
     criteria: ProductProperties,
     value: string,
   ): Promise<CustomReport> {
-    const isNumeric = (str: string) => !isNaN(Number(str));
+    try {
+      const isNumeric = (str: string) => !isNaN(Number(str));
 
-    const products = await this.productRepository.find({
-      where: { [criteria]: isNumeric(value) ? Number(value) : value },
-    });
+      const products = await this.productRepository.find({
+        where: { [criteria]: isNumeric(value) ? Number(value) : value },
+      });
 
-    return {
-      count: products.length,
-      products,
-    };
+      return {
+        count: products.length,
+        products,
+      };
+    } catch (error) {
+      throw buildInternalServerErrorResponse(
+        `An error occurred while generating your custom report for ${criteria}: ${value}`,
+        error,
+      );
+    }
   }
 }

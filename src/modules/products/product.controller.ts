@@ -19,7 +19,6 @@ import { ApiResponse } from 'src/types/types';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @UseFilters(HttpExceptionFilter)
   @Get()
   @ApiOperation({
     summary: 'Fetch paginated products.',
