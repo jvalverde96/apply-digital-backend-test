@@ -2,7 +2,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  moduleFileExtensions: ['ts'],
+  moduleFileExtensions: ['ts', 'js'],
   collectCoverage: true,
   coverageDirectory: 'coverage',
 };

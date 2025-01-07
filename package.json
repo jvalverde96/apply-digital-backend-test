@@ -21,7 +21,8 @@
     "typeorm": "typeorm",
     "typeorm:generate": "typeorm migration:generate",
     "typeorm:run": "typeorm migration:run",
-    "typeorm:revert": "typeorm migration:revert"
+    "typeorm:revert": "typeorm migration:revert",
+    "commit": "npx git-cz"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
