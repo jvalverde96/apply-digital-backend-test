@@ -31,7 +31,9 @@ The API is built using NestJS, TypeScript, PostgreSQL, and TypeORM, and is fully
 
 2. run ```npm install or yarn add``` to install all dependencies locally.
 
-3. Set Up Environment Variables: Create a .env file in the project root and add the following variables:
+3. Set Up Environment Variables: Create a .env file in the project root and paste the following:
+
+**Important: Copy the content directly from the copy icon in the top-right corner to avoid ASCII character typos.**
 
 
 ```
