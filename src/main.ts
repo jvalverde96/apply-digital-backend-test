@@ -22,6 +22,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
+  app.use((req, res, next) => {
+    logger.info(`Handling ${req.method} request for ${req.url}`);
+    next();
+  });
   await app.listen(process.env.PORT ?? 3000);
   logger.info('Server has started successfully!');
 }
