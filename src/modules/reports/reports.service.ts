@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../products/product.entity';
@@ -83,6 +83,13 @@ export class ReportsService {
     value: string,
   ): Promise<CustomReport> {
     try {
+      const validCriteria = Object.keys(ProductProperties).includes(criteria);
+      if (!validCriteria) {
+        throw new HttpException(
+          `Invalid criteria: ${criteria}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const isNumeric = (str: string) => !isNaN(Number(str));
 
       const products = await this.productRepository.find({

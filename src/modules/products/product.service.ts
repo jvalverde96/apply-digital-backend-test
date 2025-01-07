@@ -73,7 +73,7 @@ export class ProductsService {
       return allProducts;
     } catch (error) {
       throw buildInternalServerErrorResponse(
-        `An error occurred while fetching products has ocurred`,
+        `An error occurred while fetching products.`,
         error,
       );
     }
