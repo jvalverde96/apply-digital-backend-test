@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { AuthService } from './auth.service';
@@ -16,6 +16,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (payload.email === process.env.USER_EMAIL && payload.sub === 1) {
       return { userId: payload.sub, email: payload.email };
     }
-    throw new Error('Unauthorized user.');
+    throw new HttpException(
+      'Unauthorized user. Please login and try again.',
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 }

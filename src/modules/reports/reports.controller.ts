@@ -19,7 +19,7 @@ export class ReportsController {
       'Retrieve the percentage of products marked as deleted within the system. This provides insights into the deletion status of the product inventory.',
   })
   @Get('deleted-percentage')
-  async getDeletedPercentage(): Promise<ApiResponse<number>> {
+  async getDeletedPercentage(): Promise<ApiResponse<string>> {
     const percentage = await this.reportsService.getDeletedPercentage();
     return {
       success: true,
@@ -39,7 +39,7 @@ export class ReportsController {
     required: false,
     type: Boolean,
     description:
-      'Flag to either include or not the product price on the report',
+      'Flag to determine whether the product price should be considered in the report. If withPrice is true, the endpoint will count rows where the price is not null; otherwise, it will count rows where the price is null.',
   })
   @ApiQuery({
     name: 'startDate',
@@ -57,7 +57,7 @@ export class ReportsController {
     @Query('withPrice') withPrice?: boolean,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-  ): Promise<ApiResponse<number>> {
+  ): Promise<ApiResponse<string>> {
     const percentage = await this.reportsService.getNonDeletedPercentage(
       withPrice,
       startDate,

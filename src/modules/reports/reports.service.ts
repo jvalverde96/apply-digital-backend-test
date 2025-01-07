@@ -14,13 +14,13 @@ export class ReportsService {
   ) {}
 
   // Report 1: Percentage of Deleted Products
-  async getDeletedPercentage(): Promise<number> {
+  async getDeletedPercentage(): Promise<string> {
     try {
       const total = await this.productRepository.count();
       const deleted = await this.productRepository.count({
         where: { deleted: true },
       });
-      return (deleted / total) * 100;
+      return `${(deleted / total) * 100}%`;
     } catch (error) {
       throw buildInternalServerErrorResponse(
         'An error occurred while generating Percentage of Deleted Products report',
@@ -34,12 +34,14 @@ export class ReportsService {
     withPrice?: boolean,
     startDate?: string,
     endDate?: string,
-  ): Promise<number> {
+  ): Promise<string> {
     try {
       const queryBuilder = this.productRepository.createQueryBuilder('product');
 
+      // Filter by non-deleted products
       queryBuilder.where('product.deleted = :deleted', { deleted: false });
 
+      // Filter by price
       if (withPrice !== undefined) {
         if (withPrice) {
           queryBuilder.andWhere('product.price IS NOT NULL');
@@ -48,6 +50,7 @@ export class ReportsService {
         }
       }
 
+      // Filter by date range
       if (startDate && endDate) {
         queryBuilder.andWhere(
           'product.createdAt BETWEEN :startDate AND :endDate',
@@ -58,10 +61,14 @@ export class ReportsService {
         );
       }
 
-      const total = await this.productRepository.count();
+      // Count non-deleted products with the applied filters
       const nonDeleted = await queryBuilder.getCount();
 
-      return (nonDeleted / total) * 100;
+      // Count all products in the table (no filters applied)
+      const total = await this.productRepository.count();
+
+      // Calculate and return the percentage
+      return `${((nonDeleted / total) * 100).toFixed(2)}%`;
     } catch (error) {
       throw buildInternalServerErrorResponse(
         'An error occurred while generating Percentage of Non Deleted Products report',

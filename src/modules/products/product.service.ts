@@ -107,8 +107,14 @@ export class ProductsService {
 
       return updatedProduct;
     } catch (error) {
+      if (
+        error instanceof HttpException &&
+        error.getStatus() !== HttpStatus.INTERNAL_SERVER_ERROR
+      ) {
+        throw error;
+      }
       throw buildInternalServerErrorResponse(
-        `An error occurred while deleting the product: ${id} `,
+        `Failed to delete all products. Please try again.`,
         error,
       );
     }
