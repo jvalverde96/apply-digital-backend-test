@@ -3,8 +3,10 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiResponse } from 'src/types/types';
+import logger from './logger';
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
@@ -14,7 +16,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const message = exception.getResponse();
 
-    // Construct the ApiResponse structure
     const apiResponse: ApiResponse = {
       success: false,
       result: null,
@@ -28,7 +29,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
       error: typeof message === 'string' ? message : message['message'], // Capture error message
     };
 
-    // Send the response
     response.status(status).json(apiResponse);
   }
 }
+
+export const buildInternalServerErrorResponse = (
+  message: string,
+  error: unknown,
+) => {
+  logger.error(`${message}`);
+  logger.error(`Error: ${error}`);
+  throw new HttpException(`${message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+};

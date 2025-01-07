@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -19,7 +19,10 @@ export class AuthService {
       });
       return { accessToken: token };
     } else {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new HttpException(
+        'Invalid credentials. Please try again!',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 }

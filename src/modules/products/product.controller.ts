@@ -3,7 +3,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Post,
   Query,
   UseFilters,
@@ -15,6 +14,7 @@ import logger from 'src/utils/logger';
 import { HttpExceptionFilter } from 'src/utils/error-handler';
 import { ApiResponse } from 'src/types/types';
 
+@UseFilters(HttpExceptionFilter)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -117,37 +117,28 @@ export class ProductsController {
 
     return {
       success: true,
-      result: products,
       metadata: {
         page,
         count: products.length,
       },
+      result: products,
     };
   }
 
-  @UseFilters(HttpExceptionFilter)
-  @Delete(':id')
+  @Post('/sync-products')
   @ApiOperation({
-    summary: 'Simulate product deletion.',
+    summary: 'Force product synchronization with Contentful.',
     description:
-      'Sets the "deleted" flag to true for a specific product, effectively marking it as deleted without actually removing it from the database. This is useful for soft deletion where the data is kept for future reference.',
+      'Triggers a manual sync with the Contentful API to fetch the latest products data. This operation updates the product table with the most current information from Contentful, ensuring the database is up-to-date.',
   })
-  async deleteProduct(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ApiResponse<Product>> {
-    const updatedProduct = await this.productsService.deleteProduct(id);
-    logger.info(`Product with id: ${id} deleted successfully!`);
-
+  async syncProducts(): Promise<ApiResponse<Product[]>> {
+    const products = await this.productsService.fetchProducts();
     return {
       success: true,
-      result: updatedProduct,
-      metadata: {
-        id,
-      },
+      result: products,
     };
   }
 
-  @UseFilters(HttpExceptionFilter)
   @Delete('/all')
   @ApiOperation({
     summary: 'Delete all products from the database.',
@@ -159,23 +150,25 @@ export class ProductsController {
     return {
       success: true,
       result: 'All products have been deleted successfully.',
-      metadata: null,
     };
   }
 
-  @UseFilters(HttpExceptionFilter)
-  @Post('/sync')
+  @Post(':id')
   @ApiOperation({
-    summary: 'Force product synchronization with Contentful.',
+    summary: 'Simulate product deletion.',
     description:
-      'Triggers a manual sync with the Contentful API to fetch the latest products data. This operation updates the product table with the most current information from Contentful, ensuring the database is up-to-date.',
+      'Sets the "deleted" flag to true for a specific product, effectively marking it as deleted without actually removing it from the database. This is useful for soft deletion where the data is kept for future reference.',
   })
-  async syncProducts(): Promise<ApiResponse<Product[]>> {
-    const products = await this.productsService.fetchProducts();
+  async deleteProduct(@Param('id') id: string): Promise<ApiResponse<Product>> {
+    const updatedProduct = await this.productsService.deleteProduct(id);
+    logger.info(`Product with id: ${id} deleted successfully!`);
+
     return {
       success: true,
-      result: products,
-      metadata: null,
+      metadata: {
+        id,
+      },
+      result: updatedProduct,
     };
   }
 }
