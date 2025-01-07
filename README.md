@@ -20,17 +20,6 @@ The API is built using NestJS, TypeScript, PostgreSQL, and TypeORM, and is fully
 
 * CI/CD pipeline with test coverage and linting via GitHub Actions.
 
-## Prerequisites
-
-run ```npm install or yarn add```
-
-Ensure the following tools are installed:
-
-* Node.js (Active LTS version)
-
-* Docker and Docker Compose
-
-* PostgreSQL
 
 ## Steps to Run the Application
 
@@ -40,7 +29,9 @@ Ensure the following tools are installed:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```cd your repository folder```
 
-2. Set Up Environment Variables: Create a .env file in the project root and add the following variables:
+2. run ```npm install or yarn add``` to install all dependencies locally.
+
+3. Set Up Environment Variables: Create a .env file in the project root and add the following variables:
 
 
 ```
@@ -73,14 +64,14 @@ POSTGRES_DB=products_db
 
 4. Access the API
 
-* Public module (Products): Accessible without authentication.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Public module (Products): Accessible without authentication.
 
-* Private module (Reports): Requires a valid JWT in the Authorization header. Use the endpoint ```http://localhost:3000/auth/login``` in order to get a valid access token.
-Use the following credentials in the request body to login: 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Private module (Reports): Requires a valid JWT in the Authorization header. Use the endpoint  ```http://localhost:3000/auth/login``` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in order to get a valid access token. Use the following credentials in the request body to login: 
+
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;``` {"email": "user@gmail.com","password": "hello123"}```
 
-* Swagger documentation: Navigate to http://localhost:3000/api/docs.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Swagger documentation: Navigate to http://localhost:3000/api/docs.
 
 5. Force Initial Data Sync
    To manually trigger the first sync with Contentful:
